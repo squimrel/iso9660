@@ -30,6 +30,7 @@
 
 #include <array>
 #include <fstream>
+#include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -92,6 +93,7 @@ struct File {
 
   bool has(Flag flag) const;
   bool isdir() const;
+  std::size_t max_growth() const;
 };
 
 /**
@@ -157,6 +159,10 @@ struct VolumeDescriptor {
   std::string application_use;
   // The path table specifies the directory hierarchy.
   std::vector<Directory> path_table;
+  // A lookup table that can be used to quickly find files.
+  std::unordered_multimap<std::string, const iso9660::File*> filenames;
+
+  void build_file_lookup();
 };
 
 struct VolumeDescriptors {
@@ -203,11 +209,21 @@ class Image {
  public:
   explicit Image(std::fstream* file);
   void read();
+  const iso9660::File* find(const std::string& filename);
+  void modify_file(
+      const iso9660::File& file,
+      std::function<std::streamsize(std::fstream*, const File&)> modify);
 
  private:
   std::fstream& file_;
   Buffer buffer_;
   VolumeDescriptors volume_descriptors_;
+  /**
+   * In case only a minor change happened, i.e. the position of the file does
+   * not need to be changed. It's convenient to know where the file information
+   * is stored on the image.
+   */
+  std::unordered_map<std::size_t, std::vector<std::size_t>> file_positions_;
 };
 
 }  // namespace iso9660

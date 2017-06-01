@@ -28,6 +28,20 @@
 #include <vector>
 
 #include "./include/read.h"
+#include "./include/write.h"
+
+/**
+ * Initialize lookup table so that files can be quickly found by name.
+ */
+void iso9660::VolumeDescriptor::build_file_lookup() {
+  for (const auto& directory : path_table) {
+    for (const auto& file : directory.files) {
+      if (!file.isdir()) {
+        filenames.emplace(file.name, &file);
+      }
+    }
+  }
+}
 
 bool iso9660::File::has(iso9660::File::Flag flag) const {
   return (flags & static_cast<int>(flag)) != 0;
@@ -39,6 +53,10 @@ bool iso9660::File::has(iso9660::File::Flag flag) const {
  */
 bool iso9660::File::isdir() const {
   return has(iso9660::File::Flag::DIRECTORY);
+}
+
+std::size_t iso9660::File::max_growth() const {
+  return iso9660::sector_align(size) - size - extended_length;
 }
 
 iso9660::Identifier iso9660::identifier_of(const std::string& identifier) {
@@ -74,6 +92,13 @@ std::vector<iso9660::File> iso9660::Image::read_directory(
   while (record_length > 0) {
     auto file = iso9660::read::directory_record(buffer_.begin() + offset,
                                                 buffer_.end());
+    auto result = file_positions_.find(file.location);
+    if (result == file_positions_.end()) {
+      file_positions_.emplace(file.location,
+                              std::vector<std::size_t>({position + offset}));
+    } else {
+      result->second.emplace_back(position + offset);
+    }
     offset += file.length;
     record_length = static_cast<std::size_t>(buffer_[offset]);
     /*
@@ -143,4 +168,57 @@ void iso9660::Image::read() {
     throw std::runtime_error(
         "Couldn't find a primary or supplementary volume descriptor.");
   }
+  read_path_table(volume_descriptors_.primary.get());
+  read_path_table(volume_descriptors_.supplementary.get());
+}
+
+/**
+ * Find the first file matching by name.
+ */
+const iso9660::File* iso9660::Image::find(const std::string& filename) {
+  bool has_supplementary = volume_descriptors_.supplementary != nullptr;
+  auto& volume = has_supplementary ? *volume_descriptors_.supplementary
+                                   : *volume_descriptors_.primary;
+  if (volume.filenames.empty()) {
+    if (has_supplementary) {
+      iso9660::read::joliet(&(volume.path_table));
+    }
+    volume.build_file_lookup();
+  }
+  auto result = volume.filenames.find(filename);
+  if (result == volume.filenames.end()) {
+    return nullptr;
+  }
+  return result->second;
+}
+
+/**
+ * An unsafe way to modify a file.
+ * Unsafe because the fstream that is exposed to the user has power over the
+ * entire ISO 9660 image at the moment even though it should only have power
+ * over a tiny file section.
+ *
+ * TODO: Create an abstraction that provides a specially crafted fstream to the
+ * user which can even grow an arbitrary amount.
+ *
+ * An easier solution would be to have a remove_file and add_file function.
+ * Where the add_file function will be given an ifstream that will have to live
+ * until write. Especially if the modified file will exceed the maximum allowed
+ * growth such an solution would most likely be preferable.
+ *
+ * Note: Maybe a template should be used instead of std::function.
+ */
+void iso9660::Image::modify_file(
+    const iso9660::File& file,
+    std::function<std::streamsize(std::fstream*, const File&)> modify) {
+  file_.seekg(file.location * iso9660::SECTOR_SIZE + file.extended_length);
+  std::streamsize growth = modify(&file_, file);
+  if (growth == 0) return;
+  auto result = file_positions_.find(file.location);
+  if (result == file_positions_.end()) {
+    throw std::runtime_error(
+        "Could not find file location. ISO image is corrupt.");
+  }
+  iso9660::write::resize_file(&file_, result->second.begin(),
+                              result->second.end(), file.size + growth);
 }

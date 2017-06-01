@@ -72,6 +72,21 @@ T integer(iso9660::Buffer::const_iterator first,
       });
 }
 
+template <std::size_t SIZE, Endian ENDIAN, class T>
+std::array<char, SIZE> integer(const T number) {
+  constexpr std::size_t BITS_IN_BYTE = 8;
+  constexpr std::size_t bits = (SIZE - 1) * BITS_IN_BYTE;
+  std::array<char, SIZE> result;
+  for (std::size_t i = 0; i < SIZE; ++i) {
+    if (ENDIAN == ENDIANNESS) {
+      result[i] = (number >> (bits - i * BITS_IN_BYTE)) & 0xff;
+    } else {
+      result[i] = (number >> (bits - (SIZE - i - 1) * BITS_IN_BYTE)) & 0xff;
+    }
+  }
+  return result;
+}
+
 template <class T>
 void integer(T* const number, iso9660::Buffer::const_iterator big_endian,
              iso9660::Buffer::const_iterator little_endian, std::size_t size) {
