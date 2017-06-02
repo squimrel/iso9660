@@ -25,6 +25,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "./include/read.h"
@@ -41,6 +42,22 @@ void iso9660::VolumeDescriptor::build_file_lookup() {
       }
     }
   }
+}
+
+int iso9660::VolumeDescriptor::joliet_level() const {
+  /*
+   * The Joliet specification does not specify what the difference between the
+   * different levels is. Level 1-3 all specifiy the use of UCS-2 stored in the
+   * big endian format.
+   */
+  static std::unordered_map<char, int> joliet_level{
+      {'@', 1}, {'C', 2}, {'E', 3}};
+  if (escape_sequences[0] == '%' && escape_sequences[1] == '/' &&
+      escape_sequences[3] == '\0') {
+    auto level = joliet_level.find(escape_sequences[2]);
+    if (level != joliet_level.end()) return level->second;
+  }
+  return 0;
 }
 
 bool iso9660::File::has(iso9660::File::Flag flag) const {

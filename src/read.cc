@@ -238,8 +238,11 @@ iso9660::SectorType iso9660::read::volume_descriptor(
           iso9660::read::volume_descriptor(first, last, std::move(header));
       if (type == SectorType::PRIMARY) {
         volume_descriptors->primary = std::move(tmp);
-      } else {
+      } else if (tmp->joliet_level() > 0) {
         volume_descriptors->supplementary = std::move(tmp);
+      } else {
+        std::cout << "Warning: Skipping non-joliet supplementary volume "
+                  << "descriptor record." << std::endl;
       }
     } break;
     // ECMA 119 - 9.3

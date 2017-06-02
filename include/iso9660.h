@@ -163,6 +163,7 @@ struct VolumeDescriptor {
   std::unordered_multimap<std::string, const iso9660::File*> filenames;
 
   void build_file_lookup();
+  int joliet_level() const;
 };
 
 struct VolumeDescriptors {
