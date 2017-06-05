@@ -17,30 +17,44 @@
  * USA.
  */
 
-/**
- * Collection of utility functions that are deticated specifically to reading
- * an ISO 9660 image.
- */
-
-#ifndef ISO9660_READ_H_
-#define ISO9660_READ_H_
+#ifndef ISO9660_PATH_TABLE_H_
+#define ISO9660_PATH_TABLE_H_
 
 #include <cstdlib>
 
+#include <string>
+#include <vector>
+
+#include "./include/file.h"
 #include "./include/iso9660.h"
 
 namespace iso9660 {
-namespace read {
 
-std::int64_t long_datetime(iso9660::Buffer::const_iterator first,
-                           iso9660::Buffer::const_iterator last);
-std::int64_t long_datetime(iso9660::Buffer::const_iterator first,
-                           std::size_t size);
-int short_datetime(iso9660::Buffer::const_iterator first,
-                   iso9660::Buffer::const_iterator last);
-int short_datetime(iso9660::Buffer::const_iterator first, std::size_t size);
+/**
+ * ECMA-119 calls this a path table record which is basically a directory.
+ */
+class Directory {
+ public:
+  std::size_t size;
+  std::size_t extended_length;
+  std::size_t location;
+  int parent;
+  std::string name;
+  std::vector<iso9660::File> files;
 
-}  // namespace read
+  Directory(iso9660::Buffer::const_iterator first,
+            iso9660::Buffer::const_iterator last);
+};
+
+class PathTable {
+ public:
+  std::vector<Directory> directories;
+
+  PathTable(iso9660::Buffer::const_iterator first,
+            iso9660::Buffer::const_iterator last);
+  void joliet();
+};
+
 }  // namespace iso9660
 
-#endif  // ISO9660_READ_H_
+#endif  // ISO9660_PATH_TABLE_H_

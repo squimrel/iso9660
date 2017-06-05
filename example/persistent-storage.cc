@@ -25,7 +25,8 @@
 #include <string>
 #include <vector>
 
-#include "./include/iso9660.h"
+#include "./include/file.h"
+#include "./include/image.h"
 
 std::streamsize insert_overlay_switch(std::fstream* iofile,
                                       const iso9660::File& fileinfo) {
