@@ -23,13 +23,13 @@
 
 #include <algorithm>
 #include <fstream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 #ifndef NDEBUG
 #include <iostream>
 #endif
 
+#include "./include/exception.h"
 #include "./include/file.h"
 #include "./include/iso9660.h"
 #include "./include/path-table.h"
@@ -89,7 +89,7 @@ void iso9660::Image::read_path_table(
   if (volume_descriptor == nullptr) return;
   auto& volume = *volume_descriptor;
   if (volume.path_table_size > iso9660::SECTOR_SIZE) {
-    throw std::runtime_error(
+    throw iso9660::NotImplementedException(
         "This implementation can't handle path tables that have a size greater "
         "than the size of one sector.");
   }
@@ -118,7 +118,8 @@ iso9660::SectorType iso9660::Image::read_volume_descriptor() {
   auto identifier = iso9660::identifier_of(header.identifier);
   // Currently only ECMA 119 is understood.
   if (identifier != iso9660::Identifier::ECMA_119) {
-    throw std::runtime_error("Unknown identifier: " + header.identifier);
+    throw iso9660::NotImplementedException("Unknown identifier: " +
+                                           header.identifier);
   }
   switch (type) {
     // ECMA 119 - 8.2
@@ -170,7 +171,7 @@ void iso9660::Image::read() {
    * only one
    */
   if (primary_.get() == nullptr && supplementary_.get() == nullptr) {
-    throw std::runtime_error(
+    throw iso9660::CorruptFileException(
         "Couldn't find a primary or supplementary volume descriptor.");
   }
   read_path_table(primary_.get());
@@ -221,8 +222,7 @@ void iso9660::Image::modify_file(
   if (growth == 0) return;
   auto result = file_positions_.find(file.location);
   if (result == file_positions_.end()) {
-    throw std::runtime_error(
-        "Could not find file location. ISO image is corrupt.");
+    throw iso9660::CorruptFileException("Could not find file location.");
   }
   /*
    * FIXME: This is messy. In the future the supplementary and primary files

@@ -21,10 +21,10 @@
 #include <fstream>
 #include <ios>
 #include <iostream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
+#include "./include/exception.h"
 #include "./include/file.h"
 #include "./include/image.h"
 
@@ -53,15 +53,15 @@ std::streamsize insert_overlay_switch(std::fstream* iofile,
     line += '\n';
     read_bytes += line.size();
     if (read_bytes > fileinfo.size) {
-      throw std::runtime_error("Unexpected end of file at byte " +
-                               std::to_string(read_bytes) + " of " +
-                               std::to_string(fileinfo.size) + ".");
+      throw iso9660::CorruptFileException("Unexpected end of file at byte " +
+                                          std::to_string(read_bytes) + " of " +
+                                          std::to_string(fileinfo.size) + ".");
     }
     const auto position = line.find(needle);
     if (position != std::string::npos) {
       growth += overlay_switch.size();
       if (growth > max_growth) {
-        throw std::runtime_error(
+        throw iso9660::NotImplementedException(
             "Bad luck! The file has grown too much. It does not fit into the "
             "ISO 9660 image anymore without some serious modification.");
       }
@@ -93,7 +93,8 @@ std::streamsize insert_overlay_switch(std::fstream* iofile,
 void add_overlay(iso9660::Image* const isoimage, const std::string& filename) {
   auto file = isoimage->find(filename);
   if (file == nullptr) {
-    throw std::runtime_error("Can't find " + filename);
+    std::cout << "Can't find " + filename + ". Skipping..\n" << std::flush;
+    return;
   }
   isoimage->modify_file(*file, insert_overlay_switch);
 }
