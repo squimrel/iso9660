@@ -23,10 +23,12 @@
 
 #include <algorithm>
 #include <fstream>
-#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#ifndef NDEBUG
+#include <iostream>
+#endif
 
 #include "./include/file.h"
 #include "./include/iso9660.h"
@@ -136,15 +138,19 @@ iso9660::SectorType iso9660::Image::read_volume_descriptor() {
       } else if (tmp->joliet_level() > 0) {
         supplementary_ = std::move(tmp);
       } else {
+#ifndef NDEBUG
         std::cout << "Warning: Skipping non-joliet supplementary volume "
                   << "descriptor record." << std::endl;
+#endif
       }
     } break;
     // ECMA 119 - 9.3
     case SectorType::PARTITION:
     default:
+#ifndef NDEBUG
       std::cout << "Unknown type: " << static_cast<int>(header.type)
                 << std::endl;
+#endif
       break;
   }
   return type;
