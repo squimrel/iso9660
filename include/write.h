@@ -20,8 +20,6 @@
 #ifndef ISO9660_WRITE_H_
 #define ISO9660_WRITE_H_
 
-#include <cstdlib>
-
 #include <algorithm>
 #include <ostream>
 #include <utility>

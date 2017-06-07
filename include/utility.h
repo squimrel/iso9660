@@ -20,11 +20,10 @@
 #ifndef ISO9660_UTILITY_H_
 #define ISO9660_UTILITY_H_
 
-#include <cstdlib>
-
 #include <iterator>
 #include <numeric>
 #include <string>
+#include <utility>
 
 #include "./include/iso9660.h"
 

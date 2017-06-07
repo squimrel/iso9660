@@ -20,9 +20,8 @@
 #ifndef ISO9660_PATH_TABLE_H_
 #define ISO9660_PATH_TABLE_H_
 
-#include <cstdlib>
-
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "./include/file.h"

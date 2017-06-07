@@ -25,10 +25,9 @@
 #ifndef ISO9660_ISO9660_H_
 #define ISO9660_ISO9660_H_
 
-#include <cstdlib>
-
 #include <array>
 #include <string>
+#include <utility>
 
 namespace iso9660 {
 

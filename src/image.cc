@@ -19,11 +19,10 @@
 
 #include "./include/image.h"
 
-#include <cstdlib>
-
 #include <algorithm>
 #include <fstream>
 #include <string>
+#include <utility>
 #include <vector>
 #ifndef NDEBUG
 #include <iostream>
