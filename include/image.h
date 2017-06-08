@@ -45,6 +45,7 @@ class Image {
  public:
   explicit Image(std::fstream* file);
   void read();
+  void write();
   const iso9660::File* find(const std::string& filename);
   void modify_file(
       const iso9660::File& file,

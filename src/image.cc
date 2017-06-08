@@ -178,6 +178,11 @@ void iso9660::Image::read() {
 }
 
 /**
+ * After staging modifications one must always write.
+ */
+void iso9660::Image::write() {}
+
+/**
  * Find the first file matching by name.
  */
 const iso9660::File* iso9660::Image::find(const std::string& filename) {
