@@ -17,7 +17,6 @@
  * USA.
  */
 
-#include <cstdint>
 #include <fstream>
 #include <functional>
 #include <string>
@@ -26,7 +25,7 @@
 #include <vector>
 
 #include "./include/file.h"
-#include "./include/iso9660.h"
+#include "./include/buffer.h"
 #include "./include/path-table.h"
 #include "./include/volume-descriptor.h"
 
@@ -37,17 +36,30 @@ namespace iso9660 {
 
 class Image {
  private:
+  enum class Identifier {
+    ECMA_119,
+    ECMA_168,
+    // ECMA-167 Edition 2
+    ECMA_167_PREVIOUS,
+    // ECMA-167 has a different identifiers for nearly each volume descriptor.
+    ECMA_167,
+    ECMA_167_EXTENDED,
+    ECMA_167_BOOT,
+    ECMO_167_TERMINATOR,
+    UNKNOWN
+  };
+  static Identifier identifier_of(const std::string& identifier);
   void read_directories(iso9660::PathTable* const path_table);
   std::vector<iso9660::File> read_directory(std::size_t location);
   void read_path_table(iso9660::VolumeDescriptor* const volume_descriptor);
   iso9660::SectorType read_volume_descriptor();
 
  public:
-  explicit Image(std::fstream* file);
-  void read();
-  void write();
-  const iso9660::File* find(const std::string& filename);
-  void modify_file(
+  EXPORT explicit Image(std::fstream* file);
+  EXPORT void read();
+  EXPORT void write();
+  EXPORT const iso9660::File* find(const std::string& filename);
+  EXPORT void modify_file(
       const iso9660::File& file,
       std::function<std::streamsize(std::fstream*, const iso9660::File&)>
           modify);

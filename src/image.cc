@@ -30,7 +30,7 @@
 
 #include "./include/exception.h"
 #include "./include/file.h"
-#include "./include/iso9660.h"
+#include "./include/buffer.h"
 #include "./include/path-table.h"
 #include "./include/volume-descriptor.h"
 #include "./include/write.h"
@@ -114,9 +114,9 @@ iso9660::SectorType iso9660::Image::read_volume_descriptor() {
   header.type = type;
   header.identifier = utility::substr(first, last, 1, 5);
   utility::at(first, last, &header.version, 6);
-  auto identifier = iso9660::identifier_of(header.identifier);
+  auto identifier = identifier_of(header.identifier);
   // Currently only ECMA 119 is understood.
-  if (identifier != iso9660::Identifier::ECMA_119) {
+  if (identifier != iso9660::Image::Identifier::ECMA_119) {
     throw iso9660::NotImplementedException("Unknown identifier: " +
                                            header.identifier);
   }
@@ -236,4 +236,22 @@ void iso9660::Image::modify_file(
    */
   iso9660::write::resize_file(&file_, result->second.begin(),
                               result->second.end(), file.size + growth);
+}
+
+iso9660::Image::Identifier iso9660::Image::identifier_of(
+    const std::string& identifier) {
+  static const std::unordered_map<std::string, iso9660::Image::Identifier>
+      identifiers = {
+          {"CD001", iso9660::Image::Identifier::ECMA_119},
+          {"CDW02", iso9660::Image::Identifier::ECMA_168},
+          {"NSR03", iso9660::Image::Identifier::ECMA_167},
+          {"NSR02", iso9660::Image::Identifier::ECMA_167_PREVIOUS},
+          {"BEA01", iso9660::Image::Identifier::ECMA_167_EXTENDED},
+          {"BOOT2", iso9660::Image::Identifier::ECMA_167_BOOT},
+          {"TEA01", iso9660::Image::Identifier::ECMO_167_TERMINATOR}};
+  auto result = identifiers.find(identifier);
+  if (result != identifiers.end()) {
+    return result->second;
+  }
+  return iso9660::Image::Identifier::UNKNOWN;
 }

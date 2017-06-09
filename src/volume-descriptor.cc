@@ -19,11 +19,13 @@
 
 #include "./include/volume-descriptor.h"
 
+#include <algorithm>
 #include <memory>
 #include <unordered_map>
+#include <utility>
 
 #include "./include/file.h"
-#include "./include/iso9660.h"
+#include "./include/buffer.h"
 #include "./include/read.h"
 #include "./include/utility.h"
 
@@ -33,6 +35,11 @@
 iso9660::VolumeDescriptor::VolumeDescriptor(
     iso9660::Buffer::const_iterator first, iso9660::Buffer::const_iterator last,
     iso9660::VolumeDescriptorHeader generic_header) {
+  constexpr std::size_t APPLICATION_USE_SIZE = 512;
+  constexpr std::size_t DIRECTORY_RECORD_SIZE = 34;
+  constexpr std::size_t FILE_IDENTIFIER_SIZE = 37;
+  constexpr std::size_t IDENTIFIER_SIZE = 128;
+  constexpr std::size_t LONG_DATETIME_SIZE = 17;
   using utility::integer;
   namespace read = iso9660::read;
 
@@ -56,32 +63,25 @@ iso9660::VolumeDescriptor::VolumeDescriptor(
   integer(&optional_path_table_location, first + 144, first + 152, 4);
 
   root_directory = std::unique_ptr<iso9660::File>(
-      new iso9660::File(first + 156, iso9660::DIRECTORY_RECORD_SIZE));
-  volume_set_identifier =
-      utility::substr(first, last, 190, iso9660::IDENTIFIER_SIZE);
-  publisher_identifier =
-      utility::substr(first, last, 318, iso9660::IDENTIFIER_SIZE);
-  data_preparer_identifier =
-      utility::substr(first, last, 446, iso9660::IDENTIFIER_SIZE);
-  application_identifier =
-      utility::substr(first, last, 574, iso9660::IDENTIFIER_SIZE);
+      new iso9660::File(first + 156, DIRECTORY_RECORD_SIZE));
+  volume_set_identifier = utility::substr(first, last, 190, IDENTIFIER_SIZE);
+  publisher_identifier = utility::substr(first, last, 318, IDENTIFIER_SIZE);
+  data_preparer_identifier = utility::substr(first, last, 446, IDENTIFIER_SIZE);
+  application_identifier = utility::substr(first, last, 574, IDENTIFIER_SIZE);
   copyright_file_identifier =
-      utility::substr(first, last, 702, iso9660::FILE_IDENTIFIER_SIZE);
+      utility::substr(first, last, 702, FILE_IDENTIFIER_SIZE);
   abstract_file_identifier =
-      utility::substr(first, last, 739, iso9660::FILE_IDENTIFIER_SIZE);
+      utility::substr(first, last, 739, FILE_IDENTIFIER_SIZE);
   bibliographic_file_identifier =
-      utility::substr(first, last, 776, iso9660::FILE_IDENTIFIER_SIZE);
-  volume_create_datetime =
-      read::long_datetime(first + 813, iso9660::LONG_DATETIME_SIZE);
-  volume_modify_datetime =
-      read::long_datetime(first + 830, iso9660::LONG_DATETIME_SIZE);
+      utility::substr(first, last, 776, FILE_IDENTIFIER_SIZE);
+  volume_create_datetime = read::long_datetime(first + 813, LONG_DATETIME_SIZE);
+  volume_modify_datetime = read::long_datetime(first + 830, LONG_DATETIME_SIZE);
   volume_expiration_datetime =
-      read::long_datetime(first + 847, iso9660::LONG_DATETIME_SIZE);
+      read::long_datetime(first + 847, LONG_DATETIME_SIZE);
   volume_effective_datetime =
-      read::long_datetime(first + 864, iso9660::LONG_DATETIME_SIZE);
+      read::long_datetime(first + 864, LONG_DATETIME_SIZE);
   utility::at(first, last, &file_structure_version, 881);
-  application_use =
-      utility::substr(first, last, 883, iso9660::APPLICATION_USE_SIZE);
+  application_use = utility::substr(first, last, 883, APPLICATION_USE_SIZE);
 }
 
 /**

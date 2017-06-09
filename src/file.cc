@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <utility>
 
-#include "./include/iso9660.h"
+#include "./include/buffer.h"
 #include "./include/read.h"
 #include "./include/utility.h"
 
@@ -32,11 +32,12 @@
  */
 iso9660::File::File(iso9660::Buffer::const_iterator first,
                     iso9660::Buffer::const_iterator last) {
+  constexpr std::size_t SHORT_DATETIME_SIZE = 7;
   using utility::integer;
   utility::at(first, last, &length, 0);
   // + length + (length % 2 == 0 ? 0 : 1);
   utility::at(first, last, &extended_length, 1);
-  extended_length = std::move(iso9660::sector_align(extended_length));
+  extended_length = std::move(sector_align(extended_length));
   integer(&location, first + 2, first + 6, 4);
   integer(&size, first + 10, first + 14, 4);
   datetime = iso9660::read::short_datetime(first + 18, SHORT_DATETIME_SIZE);
@@ -66,5 +67,9 @@ bool iso9660::File::isdir() const {
 }
 
 std::size_t iso9660::File::max_growth() const {
-  return iso9660::sector_align(size) - size - extended_length;
+  return sector_align(size) - size - extended_length;
+}
+
+std::size_t iso9660::File::sector_align(std::size_t size) {
+  return (size + (iso9660::SECTOR_SIZE - 1)) & -iso9660::SECTOR_SIZE;
 }

@@ -27,10 +27,35 @@
 #include <vector>
 
 #include "./include/file.h"
-#include "./include/iso9660.h"
+#include "./include/buffer.h"
 #include "./include/path-table.h"
 
 namespace iso9660 {
+
+enum class SectorType {
+  BOOT_RECORD = 0,
+  PRIMARY = 1,
+  SUPPLEMENTARY = 2,
+  PARTITION = 3,
+  SET_TERMINATOR = 255
+};
+
+struct VolumeDescriptorHeader {
+  SectorType type;
+  /*
+   * Identifier specifies according to what specification the following data
+   * was recorded.  The following information was taken from ECMA-167/3:
+   * BEA01: 2/9.2 Beginning extended area descriptor.
+   * BOOT2: 2/9.4 Boot descriptor.
+   * CD001: ECMA-119
+   * CDW02: ECMA-168
+   * NSR02: ECMA-167/2
+   * NSR03: ECMA-167/3
+   * TEA01: 2/9.3 Terminating extended area descriptor.
+   */
+  std::string identifier;
+  int version;
+};
 
 /**
  * The "generic" ECMA-119 volume descriptor for the primary and supplementary

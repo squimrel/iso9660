@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "./include/file.h"
-#include "./include/iso9660.h"
+#include "./include/buffer.h"
 
 namespace iso9660 {
 

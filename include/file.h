@@ -23,7 +23,7 @@
 #include <string>
 #include <utility>
 
-#include "./include/iso9660.h"
+#include "./include/buffer.h"
 
 namespace iso9660 {
 
@@ -78,7 +78,10 @@ class File {
   File(iso9660::Buffer::const_iterator first, std::size_t size);
   bool has(Flag flag) const;
   bool isdir() const;
-  std::size_t max_growth() const;
+  EXPORT std::size_t max_growth() const;
+
+ private:
+  static std::size_t sector_align(std::size_t size);
 };
 
 }  // namespace iso9660

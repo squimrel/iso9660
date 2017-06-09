@@ -17,29 +17,21 @@
  * USA.
  */
 
-#ifndef ISO9660_EXCEPTION_H_
-#define ISO9660_EXCEPTION_H_
+#ifndef ISO9660_BUFFER_H_
+#define ISO9660_BUFFER_H_
 
-#include <stdexcept>
-#include <string>
+#include <array>
+#include <utility>
 
-#include "./include/buffer.h"
+#define EXPORT __attribute__ ((visibility ("default")))
 
 namespace iso9660 {
 
-class EXPORT Exception : public std::runtime_error {
- public:
-  explicit Exception(const std::string& what_arg);
-};
-
-class EXPORT NotImplementedException : public Exception {
-  using Exception::Exception;
-};
-
-class EXPORT CorruptFileException : public Exception {
-  using Exception::Exception;
-};
+constexpr std::size_t SECTOR_SIZE = 2048;
+constexpr std::size_t NUM_SYSTEM_SECTORS = 16;
+constexpr std::size_t SYSTEM_AREA_SIZE = NUM_SYSTEM_SECTORS * SECTOR_SIZE;
+using Buffer = std::array<unsigned char, iso9660::SECTOR_SIZE>;
 
 }  // namespace iso9660
 
-#endif  // ISO9660_EXCEPTION_H_
+#endif  // ISO9660_BUFFER_H_

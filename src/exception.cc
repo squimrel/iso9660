@@ -20,10 +20,4 @@
 #include "./include/exception.h"
 
 iso9660::Exception::Exception(const std::string& what_arg)
-    : what_arg_(what_arg) {}
-
-iso9660::Exception::~Exception() {}
-
-const char* iso9660::Exception::what() const noexcept(true) {
-  return what_arg_.c_str();
-};
+    : std::runtime_error(what_arg) {}
