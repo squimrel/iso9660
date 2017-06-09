@@ -1,11 +1,34 @@
 cmake_minimum_required(VERSION 2.6)
 project(iso9660)
 
+set (EXPORT_HEADER include/${CMAKE_PROJECT_NAME}.h)
+set (PUBLIC_HEADER ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.h)
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -O3 -DNDEBUG -fvisibility=hidden")
 
-include_directories(.)
-file(GLOB FILES src/*.cc include/*.h)
-add_library(iso9660 SHARED ${FILES})
+add_custom_command(POST_BUILD
+  OUTPUT ${PUBLIC_HEADER}
+  COMMAND sh scripts/make_header.sh ARGS ${EXPORT_HEADER} ${PUBLIC_HEADER}
+  DEPENDS ${EXPORT_HEADER}
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
+# Build library.
+include_directories(.)
+file(GLOB FILES src/*.cc)
+add_library(${CMAKE_PROJECT_NAME} SHARED ${FILES} ${PUBLIC_HEADER})
+
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+  VERSION 0
+  SOVERSION 0
+  PUBLIC_HEADER ${PUBLIC_HEADER})
+
+install(TARGETS ${CMAKE_PROJECT_NAME}
+  EXPORT ${CMAKE_PROJECT_NAME}
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include)
+
+install(EXPORT ${CMAKE_PROJECT_NAME} DESTINATION share/${CMAKE_PROJECT_NAME}/cmake)
+export(TARGETS ${CMAKE_PROJECT_NAME} FILE ${CMAKE_PROJECT_NAME}.cmake)
+
+# Build example.
 add_executable(persistent-storage example/persistent-storage.cc)
 target_link_libraries(persistent-storage iso9660)
