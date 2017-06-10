@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
-project(iso9660)
+# Don't confuse it with the libcdio-devel which provides a libiso9660.so.
+project(iso9660io)
 
-set (EXPORT_HEADER include/${CMAKE_PROJECT_NAME}.h)
+set (EXPORT_HEADER include/iso9660.h)
 set (PUBLIC_HEADER ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.h)
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -O3 -DNDEBUG -fvisibility=hidden")
 
@@ -31,4 +32,4 @@ export(TARGETS ${CMAKE_PROJECT_NAME} FILE ${CMAKE_PROJECT_NAME}.cmake)
 
 # Build example.
 add_executable(persistent-storage example/persistent-storage.cc)
-target_link_libraries(persistent-storage iso9660)
+target_link_libraries(persistent-storage ${CMAKE_PROJECT_NAME})
