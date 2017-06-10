@@ -24,8 +24,8 @@
 #include <utility>
 #include <vector>
 
-#include "./include/file.h"
 #include "./include/buffer.h"
+#include "./include/file.h"
 #include "./include/path-table.h"
 #include "./include/volume-descriptor.h"
 
@@ -59,7 +59,7 @@ class Image {
   EXPORT void read();
   EXPORT void write();
   EXPORT const iso9660::File* find(const std::string& filename);
-  EXPORT void modify_file(
+  EXPORT bool modify_file(
       const iso9660::File& file,
       std::function<std::streamsize(std::fstream*, const iso9660::File&)>
           modify);

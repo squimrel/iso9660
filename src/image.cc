@@ -28,9 +28,9 @@
 #include <iostream>
 #endif
 
+#include "./include/buffer.h"
 #include "./include/exception.h"
 #include "./include/file.h"
-#include "./include/buffer.h"
 #include "./include/path-table.h"
 #include "./include/volume-descriptor.h"
 #include "./include/write.h"
@@ -217,13 +217,13 @@ const iso9660::File* iso9660::Image::find(const std::string& filename) {
  *
  * Note: Maybe a template should be used instead of std::function.
  */
-void iso9660::Image::modify_file(
+bool iso9660::Image::modify_file(
     const iso9660::File& file,
     std::function<std::streamsize(std::fstream*, const iso9660::File&)>
         modify) {
   file_.seekg(file.location * iso9660::SECTOR_SIZE + file.extended_length);
   std::streamsize growth = modify(&file_, file);
-  if (growth == 0) return;
+  if (growth == 0) return false;
   auto result = file_positions_.find(file.location);
   if (result == file_positions_.end()) {
     throw iso9660::CorruptFileException("Could not find file location.");
@@ -236,6 +236,7 @@ void iso9660::Image::modify_file(
    */
   iso9660::write::resize_file(&file_, result->second.begin(),
                               result->second.end(), file.size + growth);
+  return true;
 }
 
 iso9660::Image::Identifier iso9660::Image::identifier_of(
