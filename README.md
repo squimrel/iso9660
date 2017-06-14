@@ -7,7 +7,7 @@ A basic and incomplete implementation of ECMA-119.
 ```
 mkdir -p build/
 cd build/
-cmake ..
+cmake -DMAKE_INSTALL_PREFIX:PATH=$PWD ..
 make
-sudo make install
+make install
 ```
