@@ -1,0 +1,32 @@
+Name:    iso9660io
+Version: @VERSION@
+Release: 1%{?dist}
+Summary: ISO 9660 manipulation using C++11
+URL:     https://github.com/squimrel/iso9660io
+License: GPLv2+
+
+Source0: https://github.com/squimrel/iso9660io/archive/%{version}.tar.gz
+
+BuildRequires: gcc-c++
+BuildRequires: cmake
+BuildRequires: make
+
+%description
+@DESCRIPTION@
+
+%prep
+%autosetup -n %{name}-%{version}
+
+%build
+%cmake .
+%make_build
+
+%install
+%make_install
+
+%files
+%{_datarootdir}/pkgconfig/%{name}.pc
+%{_includedir}/%{name}.h
+%{_libdir}/lib%{name}.so*
+
+%changelog
