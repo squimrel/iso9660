@@ -11,3 +11,9 @@ cmake -DMAKE_INSTALL_PREFIX:PATH=$PWD ..
 make
 make install
 ```
+
+## Development packaging
+
+```
+sh scripts/package.sh HEAD
+```
