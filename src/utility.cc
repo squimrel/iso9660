@@ -72,9 +72,7 @@ void utility::big_endian(std::string* const raw) {
 std::string utility::substr(iso9660::Buffer::const_iterator first,
                             iso9660::Buffer::const_iterator last,
                             std::size_t at, std::size_t size) {
-  return std::string(
-      std::make_move_iterator(first + at),
-      std::make_move_iterator(size == 0 ? last : (first + at + size)));
+  return std::string(first + at, size == 0 ? last : (first + at + size));
 }
 
 iso9660::Buffer::value_type utility::at(iso9660::Buffer::const_iterator first,

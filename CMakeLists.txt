@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0)
 # Don't confuse it with the libcdio-devel which provides a libiso9660.so.
 project(iso9660io)
 
