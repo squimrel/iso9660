@@ -42,7 +42,7 @@ std::string utility::from_ucs2(std::string&& raw) {
   utility::big_endian(&raw);
   raw += '\0';
   std::u16string result(reinterpret_cast<const char16_t*>(raw.c_str()),
-                        raw.size());
+                        raw.size() / 2);
   return utility::from_ucs2(std::move(result));
 }
 
