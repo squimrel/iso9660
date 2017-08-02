@@ -1,0 +1,59 @@
+%{?mingw_package_header}
+
+Name:    mingw-iso9660io
+Version: @VERSION@
+Release: 1%{?dist}
+Summary: @SUMMARY@
+URL:     https://github.com/squimrel/iso9660io
+License: GPLv2+
+
+Source0: https://github.com/squimrel/iso9660io/archive/%{version}.tar.gz
+
+BuildArch: noarch
+
+BuildRequires: mingw32-filesystem >= 95
+BuildRequires: mingw32-gcc-c++
+
+BuildRequires: mingw64-filesystem >= 95
+BuildRequires: mingw64-gcc-c++
+
+%description
+@DESCRIPTION@
+
+%package -n mingw32-%{shortname}
+Summary: @SUMMARY@
+
+%description -n mingw32-%{shortname}
+@DESCRIPTION@
+
+%package -n mingw64-%{shortname}
+Summary: @SUMMARY@
+
+%description -n mingw64-%{shortname}
+@DESCRIPTION@
+
+%{?mingw_debug_package}
+
+%prep
+%autosetup -n %{shortname}-%{version}
+
+%build
+%mingw_cmake .
+%mingw_make %{?_smp_mflags}
+
+%install
+%mingw_make_install DESTDIR=%{buildroot}
+
+%files -n mingw32-%{shortname}
+%{mingw32_libdir}/pkgconfig/%{shortname}.pc
+%{mingw32_includedir}/%{shortname}.h
+%{mingw32_bindir}/lib%{shortname}.dll
+%{mingw32_libdir}/lib%{shortname}.dll.a
+
+%files -n mingw64-%{shortname}
+%{mingw64_libdir}/pkgconfig/%{shortname}.pc
+%{mingw64_includedir}/%{shortname}.h
+%{mingw64_bindir}/lib%{shortname}.dll
+%{mingw64_libdir}/lib%{shortname}.dll.a
+
+%changelog

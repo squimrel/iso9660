@@ -62,8 +62,7 @@ T integer(iso9660::Buffer::const_iterator first,
 
   std::size_t i = 0;
   return std::accumulate(
-      std::make_move_iterator(first), std::make_move_iterator(last),
-      static_cast<T>(0),
+      first, last, static_cast<T>(0),
       [&i, bits](T result, iso9660::Buffer::value_type byte) {
         result |= static_cast<T>(byte) << (bits - i * BITS_IN_BYTE);
         ++i;

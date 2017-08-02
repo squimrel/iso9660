@@ -1,9 +1,28 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0)
 # Don't confuse it with the libcdio-devel which provides a libiso9660.so.
 project(iso9660io)
 
-# Provides CMAKE_INSTALL_LIBDIR.
-include(GNUInstallDirs)
+if(NOT DEFINED BINDIR)
+  set(BINDIR bin)
+endif()
+
+if(MINGW)
+  if(NOT DEFINED LIBDIR)
+    set(LIBDIR lib)
+  endif()
+  if(NOT DEFINED DATADIR)
+    set(DATADIR ${LIBDIR})
+  endif()
+else()
+  if(NOT DEFINED LIBDIR)
+    # Provides CMAKE_INSTALL_LIBDIR.
+    include(GNUInstallDirs)
+    set(LIBDIR ${CMAKE_INSTALL_LIBDIR})
+  endif()
+  if(NOT DEFINED DATADIR)
+    set(DATADIR share)
+  endif()
+endif()
 
 execute_process(COMMAND sh ${CMAKE_SOURCE_DIR}/scripts/version.sh
   OUTPUT_VARIABLE VERSION)
@@ -31,14 +50,19 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
 
 install(TARGETS ${CMAKE_PROJECT_NAME}
   EXPORT ${CMAKE_PROJECT_NAME}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  # .so
+  LIBRARY DESTINATION ${LIBDIR}
+  # .dll
+  RUNTIME DESTINATION ${BINDIR}
+  # .dll.a
+  ARCHIVE DESTINATION ${LIBDIR}
   PUBLIC_HEADER DESTINATION include)
 
 configure_file(${CMAKE_PROJECT_NAME}.pc.in
   ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.pc @ONLY)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.pc
-  DESTINATION share/pkgconfig)
+  DESTINATION ${DATADIR}/pkgconfig)
 
 # Build example.
 add_executable(persistent-storage EXCLUDE_FROM_ALL example/persistent-storage.cc)

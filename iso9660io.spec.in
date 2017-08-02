@@ -1,7 +1,7 @@
 Name:    iso9660io
 Version: @VERSION@
 Release: 1%{?dist}
-Summary: ISO 9660 manipulation using C++11
+Summary: @SUMMARY@
 URL:     https://github.com/squimrel/iso9660io
 License: GPLv2+
 
