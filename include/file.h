@@ -73,6 +73,7 @@ class File {
   int volume_sequence_number;
   std::string name;
 
+  EXPORT File();
   File(iso9660::Buffer::const_iterator first,
        iso9660::Buffer::const_iterator last);
   File(iso9660::Buffer::const_iterator first, std::size_t size);

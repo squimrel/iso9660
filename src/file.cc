@@ -26,6 +26,17 @@
 #include "./include/read.h"
 #include "./include/utility.h"
 
+iso9660::File::File()
+    : length(0),
+      extended_length(0),
+      location(0),
+      size(0),
+      datetime(0),
+      flags(0),
+      file_unit_size(0),
+      interleave_gap_size(0),
+      volume_sequence_number(0) {}
+
 /**
  * Read directory record according to ECMA-119. Note that in ECMA-167
  * information control block tags are used instead.

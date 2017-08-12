@@ -17,34 +17,20 @@
  * USA.
  */
 
-#include "./example/persistent-storage.h"
-
-#include <fstream>
-#include <ios>
 #include <iostream>
+#include <string>
 
 #include "./include/iso9660.h"
 
 #include "./example/file-manipulation.h"
 
-int main(int argc, const char* argv[]) {
-  if (argc != 2) {
-    std::cerr << "Usage: " << argv[0] << " <boot.iso>\n" << std::flush;
-    return 1;
+template <class F>
+static void add_overlay(iso9660::Image* const isoimage,
+                        const std::string& filename, F func) {
+  auto file = isoimage->find(filename);
+  if (file == nullptr) {
+    std::cout << "Can't find " + filename + ". Skipping..\n" << std::flush;
+    return;
   }
-  std::fstream isofile(argv[1],
-                       std::ios::binary | std::ios::in | std::ios::out);
-  if (!isofile.is_open()) {
-    return 1;
-  }
-  iso9660::Image isoimage(&isofile);
-  isoimage.read();
-  constexpr const char* const configfiles[] = {"isolinux.cfg", "grub.cfg",
-                                               "grub.conf"};
-  for (const char* const configfile : configfiles) {
-    add_overlay(&isoimage, configfile, insert_overlay_switch);
-  }
-  add_overlay(&isoimage, "efiboot.img",
-              add_overlay_switch_to_grub_on_fat_image);
-  isoimage.write();
+  isoimage->modify_file(*file, func);
 }

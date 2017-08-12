@@ -65,5 +65,5 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.pc
   DESTINATION ${DATADIR}/pkgconfig)
 
 # Build example.
-add_executable(persistent-storage EXCLUDE_FROM_ALL example/persistent-storage.cc)
+add_executable(persistent-storage EXCLUDE_FROM_ALL example/persistent-storage.cc example/persistent-storage.h example/file-manipulation.h example/file-manipulation.cc)
 target_link_libraries(persistent-storage ${CMAKE_PROJECT_NAME})
