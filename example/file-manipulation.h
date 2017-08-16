@@ -28,5 +28,8 @@
 std::streamsize add_overlay_switch_to_grub_on_fat_image(
     std::fstream* iofile, const iso9660::File& fileinfo);
 
+std::streamsize add_overlay_switch_to_grub_on_hfsplus_image(
+    std::fstream* iofile, const iso9660::File& fileinfo);
+
 std::streamsize insert_overlay_switch(std::fstream* iofile,
                                       const iso9660::File& fileinfo);

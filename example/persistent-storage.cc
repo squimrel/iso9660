@@ -46,5 +46,7 @@ int main(int argc, const char* argv[]) {
   }
   add_overlay(&isoimage, "efiboot.img",
               add_overlay_switch_to_grub_on_fat_image);
+  add_overlay(&isoimage, "macboot.img",
+              add_overlay_switch_to_grub_on_hfsplus_image);
   isoimage.write();
 }
