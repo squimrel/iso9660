@@ -3,9 +3,7 @@
 # In any case it packages the project at revision specified as if it's a
 # package of the latest version.
 
-source /etc/os-release
-readonly RELEASE="$(echo "$(echo "${ID}" | cut -c1)${VERSION_ID}")"
-
+readonly RELEASE="f$(rpm -E "%fedora")"
 readonly ROOT="$(git rev-parse --show-toplevel)"
 cd "${ROOT}"
 
