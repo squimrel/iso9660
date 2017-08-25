@@ -5,14 +5,20 @@ Summary: @SUMMARY@
 URL:     https://github.com/squimrel/iso9660io
 License: GPLv2+
 
-Source0: https://github.com/squimrel/iso9660io/archive/%{version}.tar.gz
+Source0: https://github.com/squimrel/iso9660io/archive/%{name}-%{version}.tar.gz
 
 BuildRequires: gcc-c++
 BuildRequires: cmake
-BuildRequires: make
 
 %description
 @DESCRIPTION@
+
+%package devel
+Summary: Headers files for developing with %{name}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+
+%description devel
+Header files for developing applications that use %{name}.
 
 %prep
 %autosetup -n %{name}-%{version}
@@ -25,8 +31,12 @@ BuildRequires: make
 %make_install
 
 %files
+%license LICENSE
+%{_libdir}/lib%{name}.so.*
+
+%files devel
 %{_datarootdir}/pkgconfig/%{name}.pc
 %{_includedir}/%{name}.h
-%{_libdir}/lib%{name}.so*
+%{_libdir}/lib%{name}.so
 
 %changelog

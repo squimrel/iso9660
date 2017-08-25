@@ -7,7 +7,7 @@ Summary: @SUMMARY@
 URL:     https://github.com/squimrel/iso9660io
 License: GPLv2+
 
-Source0: https://github.com/squimrel/iso9660io/archive/%{version}.tar.gz
+Source0: https://github.com/squimrel/iso9660io/archive/%{shortname}-%{version}.tar.gz
 
 BuildArch: noarch
 
