@@ -11,6 +11,8 @@ Source0: https://github.com/squimrel/iso9660io/archive/%{version}.tar.gz
 
 BuildArch: noarch
 
+BuildRequires: cmake
+
 BuildRequires: mingw32-filesystem >= 95
 BuildRequires: mingw32-gcc-c++
 
