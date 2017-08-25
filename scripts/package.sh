@@ -10,29 +10,29 @@ cd "${ROOT}"
 readonly NAME="iso9660io"
 readonly SUMMARY="ISO 9660 manipulation using C++11"
 VERSION="${1}"
+REVISION="${NAME}-${VERSION}"
 
-if [ -n "${VERSION}" ] && ! git rev-parse "${VERSION}" &>/dev/null; then
+if [ -n "${VERSION}" ] && ! git rev-parse "${REVISION}" &>/dev/null; then
   readonly VERSION
   if [ "${2}" != "release" ]; then
     read  -n 1 -p "Press enter to release version ${VERSION}.."
     echo "Press Ctrl-C in the next two seconds to abort the release of version ${VERSION}."
     sleep 2
   fi
-  git tag -s "${VERSION}" -m "Sign ${VERSION}" &&
+  git tag -s "${REVISION}" -m "Sign ${VERSION}" &&
   git push --tags || exit 1
 else
-  REVISION="${VERSION}"
   readonly VERSION="$(sh ./scripts/version.sh)"
   if [ -z "${REVISION}" ]; then
     REVISION="HEAD"
   fi
   readonly REVISION
-  readonly ARCHIVE="${ROOT}/build/${VERSION}.tar.gz"
-  git archive --format=tar.gz "--prefix=${NAME}-${VERSION}/" "${REVISION}" \
-    > "${ARCHIVE}"
 fi
+readonly TARBALL="${NAME}-${VERSION}.tar.gz"
+readonly ARCHIVE="${ROOT}/build/${TARBALL}"
+git archive --format=tar.gz "--prefix=${NAME}-${VERSION}/" "${REVISION}" \
+  > "${ARCHIVE}"
 
-readonly TARBALL="${VERSION}.tar.gz"
 
 update_spec() {
   package="${1}"
